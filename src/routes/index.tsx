@@ -1,24 +1,52 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { AppShell } from "@/components/app-shell";
+import {
+  AlertBanner,
+  DisconnectedPanel,
+  KpiCards,
+  SimulateOutageButton,
+  useOutageWatcher,
+} from "@/components/dashboard-parts";
+import { MetersTable } from "@/components/meters-table";
 
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
 export const Route = createFileRoute("/")({
-  component: Index,
+  head: () => ({
+    meta: [
+      { title: "Smart Meter Monitor · Live Grid Dashboard" },
+      {
+        name: "description",
+        content:
+          "Real-time smart meter telemetry dashboard: connection status, offline alerts, and fleet health KPIs.",
+      },
+      { property: "og:title", content: "Smart Meter Monitor · Live Grid Dashboard" },
+      {
+        property: "og:description",
+        content: "Monitor smart meter connectivity, outages, and telemetry in real time.",
+      },
+    ],
+  }),
+  component: Dashboard,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
-function Index() {
+function Dashboard() {
+  useOutageWatcher();
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
+    <AppShell>
+      <div className="space-y-5">
+        <div className="flex flex-wrap items-center gap-3">
+          <div>
+            <h2 className="text-lg font-semibold">Fleet Overview</h2>
+            <p className="text-sm text-muted-foreground">Live connectivity across the metering network</p>
+          </div>
+          <div className="ml-auto">
+            <SimulateOutageButton />
+          </div>
+        </div>
+        <AlertBanner />
+        <KpiCards />
+        <MetersTable />
+        <DisconnectedPanel />
+      </div>
+    </AppShell>
   );
 }
